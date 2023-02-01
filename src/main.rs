@@ -1,16 +1,20 @@
+mod vulkan;
 mod window;
 
 use glfw::{Action, Key};
 
 fn main() {
-    let mut window = window::Window::new(1280, 720, "This is a test");
+    let mut glfw = glfw::init(glfw::LOG_ERRORS).unwrap();
+    let mut window = window::Window::new(&mut glfw, 1280, 720, "This is a test");
+
+    let _renderer = vulkan::Renderer::new(&window.glfw_window);
 
     loop {
         if window.should_close() {
-            // Do app cleanup here
             break;
         }
 
+        glfw.poll_events();
         let events = window.poll_events();
         for event in events {
             match event {
