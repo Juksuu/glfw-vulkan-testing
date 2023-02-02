@@ -1,7 +1,7 @@
 use std::sync::mpsc;
 
 pub struct Window {
-    pub glfw_window: glfw::Window,
+    glfw_window: glfw::Window,
     events: mpsc::Receiver<(f64, glfw::WindowEvent)>,
 }
 
@@ -25,6 +25,16 @@ impl Window {
             glfw_window: window,
             events,
         }
+    }
+
+    pub fn get_raw_display_handle(&self) -> raw_window_handle::RawDisplayHandle {
+        use raw_window_handle::HasRawDisplayHandle;
+        self.glfw_window.raw_display_handle()
+    }
+
+    pub fn get_raw_window_handle(&self) -> raw_window_handle::RawWindowHandle {
+        use raw_window_handle::HasRawWindowHandle;
+        self.glfw_window.raw_window_handle()
     }
 
     pub fn close(&mut self) {
