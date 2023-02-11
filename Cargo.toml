@@ -3,9 +3,10 @@ name = "glfw-vulkan"
 version = "0.1.0"
 edition = "2021"
 
+[workspace]
+members = ["vulkan-library"]
+
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 [dependencies]
-ash = {version = "0.37.2", features = ["loaded", "debug", "linked"]}
-ash-window = "0.12.0"
+vulkan-library = { version = "0.1.0", path = "./vulkan-library/" }
 glfw = { version = "0.50.0", default-features = false, features = ["vulkan"]}
-raw-window-handle = "0.5.0"

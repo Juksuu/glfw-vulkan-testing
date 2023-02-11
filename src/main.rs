@@ -1,4 +1,4 @@
-mod vulkan;
+mod renderer;
 mod window;
 
 pub use window::Window;
@@ -7,7 +7,7 @@ fn main() {
     let mut glfw = glfw::init(glfw::LOG_ERRORS).unwrap();
     let mut window = window::Window::new(&mut glfw, 1280, 720, "This is a test");
 
-    let _renderer = vulkan::Renderer::new(&window);
+    let _renderer = renderer::Renderer::new(&window);
 
     loop {
         if window.should_close() {

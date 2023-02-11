@@ -150,10 +150,8 @@ dependencies = [
 name = "glfw-vulkan"
 version = "0.1.0"
 dependencies = [
- "ash",
- "ash-window",
  "glfw",
- "raw-window-handle",
+ "vulkan-library",
 ]
 
 [[package]]
@@ -208,6 +206,15 @@ dependencies = [
  "cocoa",
  "core-graphics",
  "objc",
+ "raw-window-handle",
+]
+
+[[package]]
+name = "vulkan-library"
+version = "0.1.0"
+dependencies = [
+ "ash",
+ "ash-window",
  "raw-window-handle",
 ]
 
