@@ -16,6 +16,7 @@ fn main() {
 
         glfw.poll_events();
         let events = window.poll_events();
+
         for event in events {
             match event {
                 // glfw::WindowEvent::Pos(_, _) => todo!(),

@@ -4,7 +4,7 @@ use std::{
     ptr,
 };
 
-use super::constants::{USE_VALIDATION_LAYERS, VALIDATION_LAYES};
+use super::constants::{USE_VALIDATION_LAYERS, VALIDATION_LAYERS};
 
 fn check_validation_layer_support(entry: &ash::Entry) -> bool {
     let layer_properties = entry.enumerate_instance_layer_properties().unwrap();
@@ -14,17 +14,12 @@ fn check_validation_layer_support(entry: &ash::Entry) -> bool {
         return false;
     }
 
-    let layer_properties_string: Vec<&CStr> = layer_properties
+    let layer_properties_str: Vec<&str> = layer_properties
         .iter()
-        .map(|l| unsafe { CStr::from_ptr(l.layer_name.as_ptr()) })
+        .map(|l| unsafe { CStr::from_ptr(l.layer_name.as_ptr()).to_str().unwrap() })
         .collect();
 
-    let layer_properties_str: Vec<&str> = layer_properties_string
-        .iter()
-        .map(|s| s.to_str().unwrap())
-        .collect();
-
-    VALIDATION_LAYES
+    VALIDATION_LAYERS
         .iter()
         .all(|item| layer_properties_str.contains(item))
 }
@@ -46,7 +41,7 @@ pub fn create_instance(entry: &ash::Entry, window: &crate::Window) -> ash::Insta
 
     extensions.push(ash::extensions::ext::DebugUtils::name().as_ptr());
 
-    let layer_names_cstring: Vec<CString> = VALIDATION_LAYES
+    let layer_names_cstring: Vec<CString> = VALIDATION_LAYERS
         .iter()
         .map(|l| CString::new(l.to_owned()).unwrap())
         .collect();
@@ -57,7 +52,7 @@ pub fn create_instance(entry: &ash::Entry, window: &crate::Window) -> ash::Insta
         enabled_extension_count: extensions.len() as u32,
         pp_enabled_extension_names: extensions.as_ptr(),
         enabled_layer_count: if USE_VALIDATION_LAYERS {
-            VALIDATION_LAYES.len() as u32
+            VALIDATION_LAYERS.len() as u32
         } else {
             0
         },
@@ -78,7 +73,7 @@ pub fn create_instance(entry: &ash::Entry, window: &crate::Window) -> ash::Insta
     unsafe { entry.create_instance(&create_info, None).unwrap() }
 }
 
-unsafe extern "system" fn vulkan_debug_utils_callback(
+extern "system" fn vulkan_debug_utils_callback(
     message_severity: vk::DebugUtilsMessageSeverityFlagsEXT,
     message_type: vk::DebugUtilsMessageTypeFlagsEXT,
     p_callback_data: *const vk::DebugUtilsMessengerCallbackDataEXT,
@@ -97,7 +92,7 @@ unsafe extern "system" fn vulkan_debug_utils_callback(
         vk::DebugUtilsMessageTypeFlagsEXT::VALIDATION => "[Validation]",
         _ => "[Unknown]",
     };
-    let message = CStr::from_ptr((*p_callback_data).p_message);
+    let message = unsafe { CStr::from_ptr((*p_callback_data).p_message) };
     println!("{} {} {:?}", severity, types, message);
 
     vk::FALSE
