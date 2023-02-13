@@ -1,12 +1,31 @@
-use std::ffi::{CStr, CString};
+use std::{
+    error,
+    ffi::{CStr, CString},
+    fmt,
+};
 
 use ash::vk;
 use raw_window_handle::HasRawDisplayHandle;
 
 use crate::{
     debug::{self, DebugUtils},
+    device::PhysicalDevice,
     VulkanLibrary,
 };
+
+#[derive(Debug)]
+pub struct PhysicalDeviceError;
+impl error::Error for PhysicalDeviceError {
+    fn description(&self) -> &str {
+        "Could not enumerate physical devices"
+    }
+}
+
+impl fmt::Display for PhysicalDeviceError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", self)
+    }
+}
 
 fn validate_requested_layers(library: &VulkanLibrary) -> Vec<&str> {
     let mut layers: Vec<&str> = Vec::new();
@@ -77,6 +96,19 @@ impl Instance {
         }
 
         Self { ash_instance }
+    }
+
+    pub fn enumerate_physical_devices(&self) -> Result<Vec<PhysicalDevice>, PhysicalDeviceError> {
+        let devices = unsafe { self.ash_instance.enumerate_physical_devices() };
+
+        if let Ok(devices) = devices {
+            Ok(devices
+                .iter()
+                .map(|p| PhysicalDevice::new(&self.ash_instance, *p))
+                .collect())
+        } else {
+            Err(PhysicalDeviceError)
+        }
     }
 }
 

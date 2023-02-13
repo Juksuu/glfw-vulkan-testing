@@ -1,4 +1,5 @@
 pub mod debug;
+pub mod device;
 pub mod instance;
 
 use ash::vk;
